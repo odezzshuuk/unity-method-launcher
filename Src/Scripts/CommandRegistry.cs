@@ -3,62 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static Synaptafin.PlayModeConsole.Constants;
+using UnityEngine.SceneManagement;
 
 namespace Synaptafin.PlayModeConsole {
-  public class PlayModeCommandRegistry : MonoBehaviour {
+  public class CommandRegistry : MonoBehaviour {
 
-    [Tooltip("Enable register methods with [Command] attribute in the scene.")]
-    public bool enableCommandMark = false;
-
-    [Header("Assets for registering commands cross scene")]
-    [Tooltip("Use ScriptableObject to register commands cross scene. Create by: Assets/Create/" + COMMAND_REGISTRY_SO_PATH)]
-    [SerializeField]
-    private PlayModeCommandRegistrySO _commandRegistrySO;
+    public static CommandRegistry Instance { get; private set; }
 
     public List<Command> Commands { get; private set; }
     public string[] CommandNames => Commands.Select(static c => c.Name).ToArray();
 
-    public static void RegisterGlobalGommand(Command command) {
-      PlayModeCommandRegistry instance = FindFirstObjectByType<PlayModeCommandRegistry>();
-      if (instance != null) {
-        instance.RegisterCommand(command);
-      } else {
-        Debug.LogWarning("PlayModeCommandRegistry instance not found in the scene.");
-      }
-    }
-
     public void Awake() {
-      Commands = _commandRegistrySO == null
-        ? new List<Command>()
-        : _commandRegistrySO.commands;
-
-      // _commands["test"] = new Command("test", static () => { Debug.Log("Test command executed!"); });
+      Commands = new List<Command>();
+      if (Instance != null && Instance != this) {
+        Destroy(gameObject);
+        return;
+      }
+      Instance = this;
+      DontDestroyOnLoad(gameObject);
     }
 
-    public void RegisterCommand(Command command) {
-      bool existed = Commands.Any(c => c.Id == command.Id);
-      if (existed) {  // update
-        int index = Commands.FindIndex(c => c.Id == command.Id);
-        Commands[index] = command;
-      } else {
-        Commands.Add(command);
-      }
+    public void OnEnable() {
+      SceneManager.sceneLoaded += SceneLoadedCallback;
+    }
+
+    public async void Start() {
+      await RegisterCommandAttributeCommandsAsync();
+    }
+
+    public void OnDisable() {
+      SceneManager.sceneLoaded -= SceneLoadedCallback;
     }
 
 
     public void RegisterCommand(Delegate handler, string name = default, string description = default) {
-
-      Command command = new(handler);
-      if (!string.IsNullOrEmpty(name)) {
-        command.Name = name;
-      }
-
-      if (!string.IsNullOrEmpty(description)) {
-        command.Description = description;
-      }
-
-      RegisterCommand(command);
+      RegisterCommand(handler.Method, handler.Target, name, description);
     }
 
     public void RegisterCommand(Action handler, string name = default, string description = default) {
@@ -106,27 +85,54 @@ namespace Synaptafin.PlayModeConsole {
       }
     }
 
-    private void RegisterCommandAttributeCommand() {
+    private void RegisterCommand(Command command) {
+      int index = Commands.FindIndex(c => c.Equals(command));
+      if (index >= 0) {
+        // update command
+        Commands[index] = command;
+      } else {
+        Commands.Add(command);
+      }
+    }
+
+    private void RegisterCommand(MethodInfo methodInfo, object instance, string name = default, string description = default) {
+      try {
+        Command command = new(methodInfo, instance);
+        if (!string.IsNullOrEmpty(name)) {
+          command.Name = name;
+        }
+        if (!string.IsNullOrEmpty(description)) {
+          command.FullName = description;
+        }
+        RegisterCommand(command);
+      } catch (ParameterParseException ex) {
+        Debug.LogWarning($"Failed to register command '{name ?? methodInfo.Name}': {ex.Message}");
+      }
+    }
+
+    private async Awaitable RegisterCommandAttributeCommandsAsync() {
+      await Awaitable.MainThreadAsync();
       MonoBehaviour[] mbs = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
       foreach (MonoBehaviour mb in mbs) {
         Type type = mb.GetType();
-        MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        MethodInfo[] methods = type.GetMethods(
+            BindingFlags.Instance
+            | BindingFlags.Public
+            | BindingFlags.NonPublic
+            | BindingFlags.Static
+        );
 
         foreach (MethodInfo method in methods) {
-
-          if (!Attribute.IsDefined(method, typeof(CommandAttribute))) {
-            continue;
+          if (Attribute.IsDefined(method, typeof(ConsoleCommandAttribute))) {
+            RegisterCommand(method, mb);
           }
-
-          if (method.GetParameters().Length > 0 || method.ReturnType != typeof(void)) {
-            Debug.LogWarning($"{type.Name}.{method.Name} but is not a parameterless void method. Skipping register.");
-            continue;
-          }
-          Action action = (Action)Delegate.CreateDelegate(typeof(Action), mb, method);
-          RegisterCommand(action);
         }
-
       }
+    }
+
+    private async void SceneLoadedCallback(Scene scene, LoadSceneMode mode) {
+      Commands.Clear();
+      await RegisterCommandAttributeCommandsAsync();
     }
   }
 }

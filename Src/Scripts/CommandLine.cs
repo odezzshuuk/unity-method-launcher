@@ -9,10 +9,10 @@ using CommandUIItem = UnityEngine.UIElements.PlayModeConsoleCommandItemElement;
 namespace Synaptafin.PlayModeConsole {
 
   [RequireComponent(typeof(UIDocument))]
-  [RequireComponent(typeof(PlayModeCommandRegistry))]
-  public class PlayModeCommandLine : MonoBehaviour {
+  [RequireComponent(typeof(CommandRegistry))]
+  public class CommandLine : MonoBehaviour {
 
-    private static PlayModeCommandLine s_instance;
+    private static CommandLine s_instance;
 
     private const int CANDIDATE_LIMIT = 15;
 
@@ -27,9 +27,9 @@ namespace Synaptafin.PlayModeConsole {
     private Label _commandDetail;
     private Label _typeHint;
 
-    private PlayModeCommandRegistry _playModeCommandRegistry;
+    private CommandRegistry _playModeCommandRegistry;
 
-    private string _commandText;
+    private string _queryText;
     private string[] _argsText;
     private int _selectedCommandIndex = -1;
     private int _candidateCommandCount = 0;
@@ -89,7 +89,7 @@ namespace Synaptafin.PlayModeConsole {
       }
 
       _runButton = _root.Q<Button>("run-button");
-      _playModeCommandRegistry = GetComponent<PlayModeCommandRegistry>();
+      _playModeCommandRegistry = GetComponent<CommandRegistry>();
 
       _root.RegisterCallback<PointerLeaveEvent>(evt => {
         _commandDetail.style.display = DisplayStyle.None;
@@ -138,9 +138,9 @@ namespace Synaptafin.PlayModeConsole {
 
       if (Input.GetKeyDown(KeyCode.Return)) {
 
-        if (_commandText != TargetCommand?.Name.ToLower()) {
+        if (_queryText != TargetCommand?.Name.ToLower()) {
           _inputArea.value = _candidateCommandItems[_selectedCommandIndex].CommandName;
-          _commandText = TargetCommand.Name.ToLower();
+          _queryText = TargetCommand.Name.ToLower();
           await TextFieldAsyncFocus();
           return;
         }
@@ -192,7 +192,7 @@ namespace Synaptafin.PlayModeConsole {
     }
 
     private void ExecuteCommand() {
-      if (string.IsNullOrEmpty(_commandText)) {
+      if (string.IsNullOrEmpty(_queryText)) {
         return;
       }
 
@@ -214,24 +214,24 @@ namespace Synaptafin.PlayModeConsole {
         item.style.display = DisplayStyle.None;
       }
 
-      string[] ignoreCaseParts = _inputArea.value.Split(' ');
-      if (ignoreCaseParts.Length == 0) {
-        _commandText = "";
+      string[] ignoreCaseGroups = evt.newValue.Split(' ');
+      if (ignoreCaseGroups.Length == 0) {
+        _queryText = "";
         return;
       }
 
-      _commandText = ignoreCaseParts[0].ToLower();
-      _argsText = ignoreCaseParts.Length > 1
-        ? ignoreCaseParts[1..].Select(static s => s.Trim()).ToArray()
+      _queryText = ignoreCaseGroups[0].ToLower();
+      _argsText = ignoreCaseGroups.Length > 1
+        ? ignoreCaseGroups[1..].Select(static s => s.Trim()).ToArray()
         : Array.Empty<string>();
 
       string[] commandNames = _playModeCommandRegistry.CommandNames;
       IEnumerable<Command> matchedCommands = _playModeCommandRegistry.Commands
-        .Where(c => c.Name.ToLower().Contains(_commandText.ToLower()));
+        .Where(c => c.Name.ToLower().Contains(_queryText.ToLower()));
 
       _candidateCommandCount = 0;
       foreach (Command c in matchedCommands) {
-        if (c.Name.ToLower() == _commandText.ToLower()) {
+        if (c.Name.ToLower() == _queryText.ToLower()) {
           AddModifierClassToInputArea(COMMAND_MATCHED_STYLE_CLASS);
         }
         _candidateCommandItems[_candidateCommandCount].SetData(c);
@@ -248,7 +248,7 @@ namespace Synaptafin.PlayModeConsole {
       }
 
       // when there is only one, hide all items
-      if (_candidateCommandCount == 1 && _commandText == _candidateCommandItems[0].CommandName.ToLower()) {
+      if (_candidateCommandCount == 1 && _queryText == _candidateCommandItems[0].CommandName.ToLower()) {
         _candidateCommandItems[0].style.display = DisplayStyle.None;
       }
 

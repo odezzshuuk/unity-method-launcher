@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 namespace Synaptafin.PlayModeConsole {
 
   public class PlayModeCommandRegisterHelper : MonoBehaviour {
-    [SerializeField] private PlayModeCommandRegistry _playModeCommandRegistry;
+    [SerializeField] private CommandRegistry _playModeCommandRegistry;
     [SerializeField] private GameObject[] _registeredObjects;
   }
 
