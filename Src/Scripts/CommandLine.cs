@@ -226,15 +226,23 @@ namespace Synaptafin.PlayModeConsole {
         : Array.Empty<string>();
 
       string[] commandNames = _playModeCommandRegistry.CommandNames;
-      IEnumerable<Command> matchedCommands = _playModeCommandRegistry.Commands
-        .Where(c => c.Name.ToLower().Contains(_queryText.ToLower()));
+
+      IEnumerable<(Command, float)> fuzzyMatchedCommands = _playModeCommandRegistry.Commands
+        .Select(c => {
+          string text = c.Name + c.FullName + c.TargetName;
+          float score = FuzzyMatcher.CalculateScore(text, _queryText);
+          return (c, score);
+        })
+        .Where(t => t.score > 400f)
+        .OrderByDescending(t => t.score)
+        .Take(CANDIDATE_LIMIT);
 
       _candidateCommandCount = 0;
-      foreach (Command c in matchedCommands) {
-        if (c.Name.ToLower() == _queryText.ToLower()) {
+      foreach ((Command, float) c in fuzzyMatchedCommands) {
+        if (c.Item1.Name.ToLower() == _queryText.ToLower()) {
           AddModifierClassToInputArea(COMMAND_MATCHED_STYLE_CLASS);
         }
-        _candidateCommandItems[_candidateCommandCount].SetData(c);
+        _candidateCommandItems[_candidateCommandCount].SetData(c.Item1);
         _candidateCommandItems[_candidateCommandCount].style.display = DisplayStyle.Flex;
         _candidateCommandCount++;
         if (_candidateCommandCount >= CANDIDATE_LIMIT) {
