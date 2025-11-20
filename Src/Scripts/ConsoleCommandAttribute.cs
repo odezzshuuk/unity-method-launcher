@@ -15,21 +15,5 @@ namespace Synaptafin.PlayModeConsole {
     }
   }
 
-  // public class ConsoleCommandAttributeSyntaxReceiver : ISyntaxReceiver {
-  //   public List<MethodDeclarationSyntax> CandidateMethods { get; } = new();
-  //
-  //   public void OnVisitSyntaxNode(SyntaxNode syntaxNode) {
-  //     if (syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax) {
-  //       foreach (var attributeList in methodDeclarationSyntax.AttributeLists) {
-  //         foreach (var attribute in attributeList.Attributes) {
-  //           var name = attribute.Name.ToString();
-  //           if (name == "ConsoleCommand" || name == "ConsoleCommandAttribute") {
-  //             CandidateMethods.Add(methodDeclarationSyntax);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
 
 }

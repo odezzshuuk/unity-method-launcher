@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 
 namespace Synaptafin.PlayModeConsole {
   public static class Constants {

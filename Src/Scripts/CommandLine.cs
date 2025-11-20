@@ -95,6 +95,12 @@ namespace Synaptafin.PlayModeConsole {
         _commandDetail.style.display = DisplayStyle.None;
       });
       _inputArea.RegisterCallback<ChangeEvent<string>>(SearchTextChangeCallback);
+      _inputArea.RegisterCallback<KeyDownEvent>(evt => {
+        if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.Escape ||
+            evt.keyCode == KeyCode.UpArrow || evt.keyCode == KeyCode.DownArrow) {
+          evt.StopPropagation();
+        }
+      });
       _runButton.RegisterCallback<ClickEvent>(evt => {
         ExecuteCommand();
       });
