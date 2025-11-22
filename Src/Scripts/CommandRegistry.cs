@@ -111,7 +111,7 @@ namespace Synaptafin.PlayModeConsole {
     }
 
     private async Awaitable RegisterCommandAttributeCommandsAsync() {
-      await Awaitable.MainThreadAsync();
+      await Awaitable.NextFrameAsync();
       MonoBehaviour[] mbs = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
       foreach (MonoBehaviour mb in mbs) {
         Type type = mb.GetType();
