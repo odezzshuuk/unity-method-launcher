@@ -144,6 +144,11 @@ namespace Synaptafin.PlayModeConsole {
 
       if (Input.GetKeyDown(KeyCode.Return)) {
 
+        if (_candidateCommandCount == 0) {
+          await TextFieldAsyncFocus();
+          return;
+        }
+
         if (_queryText != TargetCommand?.Name.ToLower()) {
           _inputArea.value = _candidateCommandItems[_selectedCommandIndex].CommandName;
           _queryText = TargetCommand.Name.ToLower();
@@ -256,10 +261,13 @@ namespace Synaptafin.PlayModeConsole {
         }
       }
 
+
+      // no matched command 
       if (_candidateCommandCount == 0) {
         TargetCommand = null;
         return;
       }
+
 
       // when there is only one, hide all items
       if (_candidateCommandCount == 1 && _queryText == _candidateCommandItems[0].CommandName.ToLower()) {
