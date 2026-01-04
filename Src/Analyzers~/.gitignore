@@ -36,3 +36,6 @@ TestResults/
 *.log
 *.bak
 *.cache
+
+output/
+!*.csproj
