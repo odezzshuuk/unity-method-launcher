@@ -3,13 +3,13 @@ using System.Linq;
 using System.Collections.Generic;
 
 
-namespace Synaptafin.PlayModeConsole {
+namespace Odezzshuuk.Workflow.MethodLauncher {
   public static class Utils {
     public static string GetShortTypeName(Type type) {
-      return s_shortTypeNames.TryGetValue(type, out string shortName) ? shortName : type.Name;
+      return s_ShortTypeNames.TryGetValue(type, out string shortName) ? shortName : type.Name;
     }
 
-    private static readonly Dictionary<Type, string> s_shortTypeNames = new() {
+    private static readonly Dictionary<Type, string> s_ShortTypeNames = new() {
       { typeof(int), "int" },
       { typeof(float), "float" },
       { typeof(double), "double" },

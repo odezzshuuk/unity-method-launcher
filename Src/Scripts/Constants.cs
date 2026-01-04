@@ -1,5 +1,5 @@
 
-namespace Synaptafin.PlayModeConsole {
+namespace Odezzshuuk.Workflow.MethodLauncher {
   public static class Constants {
 
     public const string INPUT_FIELD_DEFAULT_STYLE_CLASS = "input-area__text-field";

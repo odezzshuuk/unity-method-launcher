@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Synaptafin.PlayModeConsole {
+namespace Odezzshuuk.Workflow.MethodLauncher {
   public class CommandRegistry : MonoBehaviour {
 
     public static CommandRegistry Instance { get; private set; }
@@ -123,7 +123,7 @@ namespace Synaptafin.PlayModeConsole {
         );
 
         foreach (MethodInfo method in methods) {
-          if (Attribute.IsDefined(method, typeof(ConsoleCommandAttribute))) {
+          if (Attribute.IsDefined(method, typeof(LaunchableAttribute))) {
             RegisterCommand(method, mb);
           }
         }

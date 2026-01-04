@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Synaptafin.PlayModeConsole {
+namespace Odezzshuuk.MethodLauncher {
 
   public class ElementUxmlAssets {
 

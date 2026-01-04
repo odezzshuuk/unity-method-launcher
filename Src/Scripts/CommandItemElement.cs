@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
-using Synaptafin.PlayModeConsole;
+using Odezzshuuk.Workflow.MethodLauncher;
 
 namespace UnityEngine.UIElements {
 
-  [UxmlElement("PlayModeConsoleCommandItem")]
-  public partial class PlayModeConsoleCommandItemElement : VisualElement {
+  [UxmlElement("LaunchableItem")]
+  public partial class LaunchableItemElement : VisualElement {
 
     private readonly Label _commandName;
     private readonly Label _commandDescription;
@@ -18,8 +18,8 @@ namespace UnityEngine.UIElements {
     public string CommandName => _commandName.text;
     public string CommandDetail { get; set; }
 
-    public PlayModeConsoleCommandItemElement() { }
-    public PlayModeConsoleCommandItemElement(VisualElement root) : this() {
+    public LaunchableItemElement() { }
+    public LaunchableItemElement(VisualElement root) : this() {
       Add(root);
       _commandName = root.Q<Label>("name");
       _commandDescription = root.Q<Label>("description");

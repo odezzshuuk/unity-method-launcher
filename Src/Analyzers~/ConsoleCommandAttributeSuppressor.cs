@@ -1,35 +1,36 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using static Synaptafin.PlayModeConsole.Analyzers.Constants;
+using static Odezzshuuk.Workflow.MethodLauncher.Analyzers.Constants;
 
-namespace Synaptafin.PlayModeConsole.Analyzer {
+namespace Odezzshuuk.Workflow.MethodLauncher.Analyzer {
   [DiagnosticAnalyzer(LanguageNames.CSharp)]
   public class ConsoleCommandAttributeSuppressor : DiagnosticSuppressor {
 
     // Define the suppression descriptor
-    private static readonly SuppressionDescriptor s_rule = new SuppressionDescriptor(
+    private static readonly SuppressionDescriptor s_Rule = new(
         id: PRIVATE_UNUSED_MEMBER_SUPPRESSION_ID,
         suppressedDiagnosticId: UNUSED_MEMBER_DIAGNOSTIC_ID,
         justification: "Private methods marked with [Command] are used via reflection/framework logic.");
 
-    public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(s_rule);
+    public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions => ImmutableArray.Create(s_Rule);
 
     public override void ReportSuppressions(SuppressionAnalysisContext context) {
       foreach (Diagnostic diagnostic in context.ReportedDiagnostics) {
         // Check if the diagnostic ID matches the one we want to suppress
         if (diagnostic.Id == UNUSED_MEMBER_DIAGNOSTIC_ID || diagnostic.Id == "CS0628") {
-          SyntaxTree syntaxTree = diagnostic.Location.SourceTree;
+          SyntaxTree? syntaxTree = diagnostic.Location.SourceTree;
+          if (syntaxTree == null) continue;
           SyntaxNode root = syntaxTree.GetRoot(context.CancellationToken);
           SyntaxNode node = root.FindNode(diagnostic.Location.SourceSpan);
 
           // Get the semantic model to check symbols/attributes
           SemanticModel semanticModel = context.GetSemanticModel(syntaxTree);
-          ISymbol memberSymbol = semanticModel.GetDeclaredSymbol(node);
+          ISymbol? memberSymbol = semanticModel.GetDeclaredSymbol(node);
 
           if (memberSymbol != null && HasCommandAttribute(memberSymbol)) {
             // If it has the attribute, suppress the diagnostic
-            context.ReportSuppression(Suppression.Create(s_rule, diagnostic));
+            context.ReportSuppression(Suppression.Create(s_Rule, diagnostic));
           }
         }
       }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3639284750679925371}
   - component: {fileID: 8652420512233420554}
   m_Layer: 0
-  m_Name: PlayModeConsole
+  m_Name: MethodLauncher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

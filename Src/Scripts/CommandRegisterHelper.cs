@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Synaptafin.PlayModeConsole {
+namespace Odezzshuuk.Workflow.MethodLauncher {
 
   public class PlayModeCommandRegisterHelper : MonoBehaviour {
     [SerializeField] private CommandRegistry _playModeCommandRegistry;

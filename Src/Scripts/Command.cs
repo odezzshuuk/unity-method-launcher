@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Synaptafin.PlayModeConsole {
+namespace Odezzshuuk.Workflow.MethodLauncher {
 
   public abstract class CommandBase {
     protected MethodInfo _methodInfo;

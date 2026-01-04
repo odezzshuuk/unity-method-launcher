@@ -2,9 +2,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Linq;
-using static Synaptafin.PlayModeConsole.Analyzers.Constants;
+using static Odezzshuuk.Workflow.MethodLauncher.Analyzers.Constants;
 
-namespace Synaptafin.PlayModeConsole.Analyzer {
+namespace Odezzshuuk.Workflow.MethodLauncher.Analyzer {
 
   [DiagnosticAnalyzer(LanguageNames.CSharp)]
   public class ConsoleCommandAttributeAnalyzer : DiagnosticAnalyzer {

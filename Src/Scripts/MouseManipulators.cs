@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Synaptafin.PlayModeConsole {
+namespace Odezzshuuk.Workflow.MethodLauncher {
   public class DragManipulator : PointerManipulator {
     private Vector2 _targetStartPosition;
     private Vector3 _pointerStartPosition;
